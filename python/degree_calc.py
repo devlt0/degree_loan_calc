@@ -31,12 +31,12 @@ def get_color_for_ratio(ratio: float) -> str:
         return "background-color: orange"
     return "background-color: red"
 
-def calculate_total_tuition(base_tuition: float, is_per_semester: bool,
+def calculate_total_tuition(base_tuition: float,
                           semesters_per_year: int, yearly_increase: float,
                           num_yrs_college: int) -> float:
     """Calculate total tuition cost over 4 years with yearly increases."""
     total = 0
-    yearly_tuition = base_tuition * (semesters_per_year if is_per_semester else 1)
+    yearly_tuition = base_tuition * semesters_per_year
 
     for year in range(num_yrs_college):  # Assuming 4-year degree
         total += yearly_tuition
@@ -129,11 +129,8 @@ def main():
             submitted = st.button("Calculate")
 
     if submitted: #st.button("Calculate"):#submitted:
-        # Calculate total tuition
-        is_per_semester = tuition_period == "Per Semester"
         total_tuition = calculate_total_tuition(
             current_tuition,
-            is_per_semester,
             semesters_per_year,
             tuition_hike/100,
             number_yrs_college
@@ -144,7 +141,7 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             st.write("### Analysis Results")
-            st.write(f"Estimated total 4-year tuition cost: ${total_tuition:,.2f}")
+            st.write(f"Estimated total {number_yrs_college}-year tuition cost: ${total_tuition:,.2f}")
             st.write(f"Estimated monthly take-home pay: ${monthly_takehome:,.2f}")
 
             # Calculate and display loan payments for different terms
@@ -184,13 +181,15 @@ def main():
             elif remaining_money < 400: # spare 100 a week to keep from paycheck to paychk
                 txt_clr = 'orange'
             elif remaining_money < 750:
-                txt_clr = 'yellow'
+                txt_clr = 'blue' #'yellow' # yellow technically not supported thus the intermittent issues
+            # Colored text, using the syntax :color[text to be colored],
+            ## where color needs to be replaced with any of the following supported colors: blue, green, orange, red, violet
 
             st.write("### Financial Summary")
             st.write(f"Monthly take-home pay (after taxes + fica): ${monthly_takehome:,.2f}")
             st.write(f"Estimated cost of living: ${cost_of_living:,.2f}")
             st.write(f"Lowest monthly payment: ${lowest_payment:,.2f}")
-            st.write(f":{txt_clr}[Remaining monthly income: ${remaining_money:,.2f}]")
+            st.markdown(f":{txt_clr}[Remaining monthly income: ${remaining_money:,.2f}]")
 
 
             if remaining_money < 0:
