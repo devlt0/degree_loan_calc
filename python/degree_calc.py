@@ -23,6 +23,12 @@ def calculate_monthly_payment(principal: float, annual_rate: float, years: int) 
 
 def get_color_for_ratio(ratio: float) -> str:
     """Return color based on the ratio of payment to income."""
+    if isinstance(ratio, str):
+        try:
+            ratio = float(ratio)
+        except Exception as e:
+            st.warning(e)
+
     if ratio <= 15:
         return "background-color: green"
     elif ratio <= 33.333:
@@ -157,9 +163,9 @@ def main():
                 payment_ratio = monthly_payment / monthly_takehome
 
                 results.append({
-                    "Term (Yrs)": years,
+                    "Term (Years)": years,
                     "Monthly Payment": f"${monthly_payment:,.2f}",
-                    "% of Take-Home": payment_ratio*100,
+                    "% of Take-Home": f"{payment_ratio*100:,.2f}",
                 })
 
             df = pd.DataFrame(results)
@@ -168,7 +174,7 @@ def main():
                 return [get_color_for_ratio(row['% of Take-Home'])] * len(row)
 
             styled_df = df.style.apply(style_rows, axis=1)
-            st.dataframe(styled_df)
+            st.dataframe(styled_df, hide_index=True)
             st.write(f"Note: Table color coding is based on loan payment % of monthly takehome")
         with col2:
             # Additional analysis
