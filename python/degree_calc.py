@@ -18,7 +18,8 @@ def calculate_monthly_payment(principal: float, annual_rate: float, years: int) 
     n = years * 12        # Total number of payments
     if r == 0:
         return principal / n
-    return principal * (r * (1 + r)**n) / ((1 + r)**n - 1)
+    monthly_payment = principal * (r * (1 + r)**n) / ((1 + r)**n - 1)
+    return monthly_payment
 
 def get_color_for_ratio(ratio: float) -> str:
     """Return color based on the ratio of payment to income."""
@@ -56,12 +57,12 @@ def estimate_takehome_pay(gross_salary: float) -> float:
     else:
         tax_rate = 0.32
 
-    # Assuming standard deduction of $13,850 (2024)
-    taxable_income = max(0, gross_salary - 13850)
+    std_deduction_2024 = 13850
+    taxable_income = max(0, gross_salary - std_deduction_2024)
     taxes = taxable_income * tax_rate
 
-    # Rough estimate of FICA taxes (7.65%)
-    fica = gross_salary * 0.0765
+    fica = gross_salary * 0.0765 # presume employee not contractor or self employeed / then x2
+    # should have opt for std deduction to go up but this is estimator
 
     annual_takehome = gross_salary - taxes - fica
     return annual_takehome / 12
@@ -71,7 +72,7 @@ def main():
     #st.title("Student Loan Repayment Calculator")
     st.write("Analyze your ability to repay student loans based on future career prospects")
     with st.sidebar:
-        with st.form("loan_calculator"):
+        #with st.form("loan_calculator"):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -82,43 +83,52 @@ def main():
 
                 tuition_period = st.selectbox("Tuition Period",
                                             ["Per Semester", "Per Year"])
-
-                semesters_per_year = st.number_input("Semesters per Year",
-                                                   min_value=1,
-                                                   max_value=8,
-                                                   value=2)
+                if tuition_period == "Per Semester":
+                    semesters_per_year = st.number_input("Semesters per Year",
+                                                       min_value=1,
+                                                       max_value=8,
+                                                       value=2,
+                                                       step=1)
+                else:
+                    semesters_per_year = 1
 
                 number_yrs_college = st.number_input("Number of years for degree",
                                                     min_value=1,
                                                     max_value=100,
-                                                    value=4
+                                                    value=4,
+                                                    step=1
                                                     )
 
             with col2:
                 tuition_hike = st.number_input("Average Annual Tuition Increase (%)",
                                              min_value=0.0,
                                              max_value=50.0,
-                                             value=5.0)
+                                             value=5.0,
+                                             step=1.0)
 
                 interest_rate = st.number_input("Average Interest Rate (%)",
                                               min_value=0.0,
                                               max_value=50.0,
-                                              value=9.0)
+                                              value=9.0,
+                                              step=1.0)
 
                 #profession = st.text_input("Expected Entry-Level Position",
                 #                         "Software Engineer")
 
                 expected_salary = st.number_input("Expected Annual Starting Salary ($)",
                                                 min_value=0,
-                                                value=50000)
+                                                value=50000,
+                                                step = 1000)
 
                 cost_of_living = st.number_input("Estimated Monthly Cost of Living ($)",
                                                min_value=0,
-                                               value=2500)
+                                               value=2500,
+                                               step=100)
 
-            submitted = st.form_submit_button("Calculate")
+            #submitted = st.form_submit_button("Calculate")
+            submitted = st.button("Calculate")
 
-    if submitted:
+    if submitted: #st.button("Calculate"):#submitted:
         # Calculate total tuition
         is_per_semester = tuition_period == "Per Semester"
         total_tuition = calculate_total_tuition(
@@ -134,11 +144,11 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             st.write("### Analysis Results")
-            st.write(f"Total 4-year tuition cost: ${total_tuition:,.2f}")
+            st.write(f"Estimated total 4-year tuition cost: ${total_tuition:,.2f}")
             st.write(f"Estimated monthly take-home pay: ${monthly_takehome:,.2f}")
 
             # Calculate and display loan payments for different terms
-            loan_terms = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+            loan_terms = [5, 10, 15, 20, 25, 30]
             results = []
 
             for years in loan_terms:
@@ -153,43 +163,45 @@ def main():
                     "Term (Yrs)": years,
                     "Monthly Payment": f"${monthly_payment:,.2f}",
                     "% of Take-Home": payment_ratio*100,
-                    #"% of Take-Home": f"{payment_ratio*100:.1f}%",
-                    #"Ratio": payment_ratio  # Added for styling
                 })
 
-            # Create DataFrame and style it
             df = pd.DataFrame(results)
 
-            # Create a style function that returns a list of styles for each row
             def style_rows(row):
                 return [get_color_for_ratio(row['% of Take-Home'])] * len(row)
 
-            # Apply styling and display
             styled_df = df.style.apply(style_rows, axis=1)
-
             st.dataframe(styled_df)
-
+            st.write(f"Note: Table color coding is based on loan payment % of monthly takehome")
         with col2:
             # Additional analysis
             lowest_payment = min([float(r["Monthly Payment"].replace("$", "").replace(",", ""))
                                 for r in results])
             remaining_money = monthly_takehome - lowest_payment - cost_of_living
+            txt_clr = 'green'
+            if remaining_money < 0:
+                txt_clr = 'red'
+            elif remaining_money < 400: # spare 100 a week to keep from paycheck to paychk
+                txt_clr = 'orange'
+            elif remaining_money < 750:
+                txt_clr = 'yellow'
 
             st.write("### Financial Summary")
-            st.write(f"Lowest monthly payment: ${lowest_payment:,.2f}")
-            st.write(f"Monthly take-home pay: ${monthly_takehome:,.2f}")
+            st.write(f"Monthly take-home pay (after taxes + fica): ${monthly_takehome:,.2f}")
             st.write(f"Estimated cost of living: ${cost_of_living:,.2f}")
-            st.write(f"Remaining monthly income: ${remaining_money:,.2f}")
+            st.write(f"Lowest monthly payment: ${lowest_payment:,.2f}")
+            st.write(f":{txt_clr}[Remaining monthly income: ${remaining_money:,.2f}]")
+
 
             if remaining_money < 0:
                 st.error("Warning: Your estimated expenses exceed your take-home pay!")
-            elif remaining_money < 500:
-                st.warning("Caution: Your remaining monthly income is very low!")
-            # potentially take out the spare 1k a month
-            elif remaining_money < 1000:
-                st.warning("Caution: Your remaining monthly income is low!")
+            elif remaining_money < 400: # spare 100 a week to keep from paycheck to paychk
+                st.warning("Caution: Your remaining monthly income is very low! Less than $400/month.")
+            # potentially take out the spare 1k a month --> reduce to 750 // 800 minus a minor incidental ~= 200/wk -50 oh shit happened
+            elif remaining_money < 750:
+                st.warning("Caution: Your remaining monthly income is low! Less than $750/month")
             else:
-                st.success("Your financial plan appears sustainable!")
+                st.success("Your financial plan appears sustainable! Minimum $750/month remaining.")
 
 if __name__ == "__main__":
     main()

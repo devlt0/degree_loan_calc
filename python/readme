@@ -1,0 +1,12 @@
+Python + Streamlit version of degree loan calculator
+
+Currently the estimator does not account for things such as lay offs, time between jobs, raises/promotions, salary increases.
+Does account for;
+tuition increase between years
+interest on loan
+various term lengths
+cost of living
+expected salary upon graduation
+
+
+Ideally would add button to type in chosen profession and provide rough estimate of entry level salary vs currently user provided.
