@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 //import './App.css';
 import './globals.css';
 
@@ -67,6 +69,7 @@ const estimateTakehomePay = (grossSalary: number): number => {
 };
 
 const App: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentTuition, setCurrentTuition] = useState(10000.0);
   const [tuitionPeriod, setTuitionPeriod] = useState("Per Semester");
   const [semestersPerYear, setSemestersPerYear] = useState(2);
@@ -99,101 +102,161 @@ const App: React.FC = () => {
   };
 
   return (
- <div className="App container mx-auto max-w-2xl p-2">
-      <h1 className="text-2xl font-bold mb-6 text-center">Student Loan Repayment Calculator</h1>
-      
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        <label className="text-right py-2">Current Tuition Amount:</label>
-        <input 
-          type="number" 
-          className="border rounded p-2 w-full"
-          value={currentTuition} 
-          onChange={e => setCurrentTuition(parseFloat(e.target.value))} 
-          step="1000"
-        />
+    <div className="App min-h-screen bg-gray-900  flex">
+      {/* Sidebar */}
+      <div className={`relative ${isSidebarOpen ? 'w-64' : 'w-0'} bg-gray-800 transition-all duration-300`}>
+        <div className={`${isSidebarOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 p-4 space-y-4`}>
+          <h2 className="text-lg font-semibold mb-4">Input Parameters</h2>
+          
+          <div className="space-y-2">
+            <label className="block text-sm">Current Tuition Amount</label>
+            <div className="flex items-center space-x-2">
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setCurrentTuition(prev => prev - 1000)}>-</button>
+              <input 
+                type="number" 
+                className="bg-gray-700  rounded p-1 w-full"
+                value={currentTuition} 
+                onChange={e => setCurrentTuition(parseFloat(e.target.value))} 
+                step="1000"
+              />
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setCurrentTuition(prev => prev + 1000)}>+</button>
+            </div>
+          </div>
 
-        <label className="text-right py-2">Tuition Period:</label>
-        <select 
-          className="border rounded p-2 w-full"
-          value={tuitionPeriod} 
-          onChange={e => setTuitionPeriod(e.target.value)}
+          <div className="space-y-2">
+            <label className="block text-sm">Tuition Period</label>
+            <select 
+              className="bg-gray-700  rounded p-1 w-full"
+              value={tuitionPeriod} 
+              onChange={e => setTuitionPeriod(e.target.value)}
+            >
+              <option value="Per Semester">Per Semester</option>
+              <option value="Per Year">Per Year</option>
+            </select>
+          </div>
+
+          {tuitionPeriod === "Per Semester" && (
+            <div className="space-y-2">
+              <label className="block text-sm">Semesters per Year</label>
+              <div className="flex items-center space-x-2">
+                <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setSemestersPerYear(prev => Math.max(1, prev - 1))}>-</button>
+                <input 
+                  type="number" 
+                  className="bg-gray-700  rounded p-1 w-full"
+                  value={semestersPerYear} 
+                  onChange={e => setSemestersPerYear(parseInt(e.target.value))} 
+                  step="1"
+                />
+                <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setSemestersPerYear(prev => prev + 1)}>+</button>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="block text-sm">Years for degree</label>
+            <div className="flex items-center space-x-2">
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setNumberYrsCollege(prev => Math.max(1, prev - 1))}>-</button>
+              <input 
+                type="number" 
+                className="bg-gray-700  rounded p-1 w-full"
+                value={numberYrsCollege} 
+                onChange={e => setNumberYrsCollege(parseInt(e.target.value))} 
+                step="1"
+              />
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setNumberYrsCollege(prev => prev + 1)}>+</button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm">Annual Tuition Increase (%)</label>
+            <div className="flex items-center space-x-2">
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setTuitionHike(prev => Math.max(0, prev - 1))}>-</button>
+              <input 
+                type="number" 
+                className="bg-gray-700  rounded p-1 w-full"
+                value={tuitionHike} 
+                onChange={e => setTuitionHike(parseFloat(e.target.value))} 
+                step="1"
+              />
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setTuitionHike(prev => prev + 1)}>+</button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm">Interest Rate (%)</label>
+            <div className="flex items-center space-x-2">
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setInterestRate(prev => Math.max(0, prev - 1))}>-</button>
+              <input 
+                type="number" 
+                className="bg-gray-700  rounded p-1 w-full"
+                value={interestRate} 
+                onChange={e => setInterestRate(parseFloat(e.target.value))} 
+                step="1"
+              />
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setInterestRate(prev => prev + 1)}>+</button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm">Expected Starting Salary ($)</label>
+            <div className="flex items-center space-x-2">
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setExpectedSalary(prev => Math.max(0, prev - 1000))}>-</button>
+              <input 
+                type="number" 
+                className="bg-gray-700  rounded p-1 w-full"
+                value={expectedSalary} 
+                onChange={e => setExpectedSalary(parseInt(e.target.value))} 
+                step="1000"
+              />
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setExpectedSalary(prev => prev + 1000)}>+</button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm">Monthly Cost of Living ($)</label>
+            <div className="flex items-center space-x-2">
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setCostOfLiving(prev => Math.max(0, prev - 100))}>-</button>
+              <input 
+                type="number" 
+                className="bg-gray-700  rounded p-1 w-full"
+                value={costOfLiving} 
+                onChange={e => setCostOfLiving(parseInt(e.target.value))} 
+                step="100"
+              />
+              <button className="bg-gray-700 px-2 py-1 rounded" onClick={() => setCostOfLiving(prev => prev + 100)}>+</button>
+            </div>
+          </div>
+
+          <button 
+            onClick={handleCalculate}
+            className="w-full bg-blue-600 hover:bg-blue-700  font-bold py-2 px-4 rounded transition-colors duration-200"
+          >
+            Calculate
+          </button>
+        </div>
+
+        {/* Sidebar toggle button */}
+        <button
+          className="absolute -right-6 top-1/2 transform -translate-y-1/2 bg-gray-800 p-1 rounded-r"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
-          <option value="Per Semester">Per Semester</option>
-          <option value="Per Year">Per Year</option>
-        </select>
-
-        {tuitionPeriod === "Per Semester" && (
-          <>
-            <label className="text-right py-2">Semesters per Year:</label>
-            <input 
-              type="number" 
-              className="border rounded p-2 w-full"
-              value={semestersPerYear} 
-              onChange={e => setSemestersPerYear(parseInt(e.target.value))} 
-              step="1"
-            />
-          </>
-        )}
-
-        <label className="text-right py-2">Number of years for degree:</label>
-        <input 
-          type="number" 
-          className="border rounded p-2 w-full"
-          value={numberYrsCollege} 
-          onChange={e => setNumberYrsCollege(parseInt(e.target.value))} 
-          step="1" 
-        />
-
-        <label className="text-right py-2">Average Annual Tuition Increase (%):</label>
-        <input 
-          type="number" 
-          className="border rounded p-2 w-full"
-          value={tuitionHike} 
-          onChange={e => setTuitionHike(parseFloat(e.target.value))} 
-          step="1" 
-        />
-
-        <label className="text-right py-2">Average Interest Rate (%):</label>
-        <input 
-          type="number" 
-          className="border rounded p-2 w-full"
-          value={interestRate} 
-          onChange={e => setInterestRate(parseFloat(e.target.value))} 
-          step="1" 
-        />
-
-        <label className="text-right py-2">Expected Annual Starting Salary ($):</label>
-        <input 
-          type="number" 
-          className="border rounded p-2 w-full"
-          value={expectedSalary} 
-          onChange={e => setExpectedSalary(parseInt(e.target.value))} 
-          step="1000" 
-        />
-
-        <label className="text-right py-2">Estimated Monthly Cost of Living ($):</label>
-        <input 
-          type="number" 
-          className="border rounded p-2 w-full"
-          value={costOfLiving} 
-          onChange={e => setCostOfLiving(parseInt(e.target.value))} 
-          step="100" 
-        />
-      </div>
-
-      <div className="text-center mb-6">
-        <button 
-          onClick={handleCalculate}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors duration-200"
-        >
-          Calculate
+          {isSidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
       </div>
 
-      {results.length > 0 && (
-        <div className="text-center">
-          <h2 className="text-xl font-bold mb-4">Analysis Results</h2>
-          <div className="overflow-x-auto">
+      {/* Main content */}
+      <div className="flex-1 p-6">
+        <h1 className="text-xl font-bold mb-6">Analyze your ability to repay student loans based on future career prospects</h1>
+        
+        {results.length > 0 && (
+          <div className="grid grid-cols-2 gap-6">
+            {/* Results table */}
+            <div>
+              <h2 className="text-lg font-bold mb-4">Analysis Results</h2>
+              <p className="mb-4">Estimated total 4-year tuition cost: ${(currentTuition * semestersPerYear * numberYrsCollege).toFixed(2)}</p>
+              <p className="mb-4">Estimated monthly take-home pay: ${estimateTakehomePay(expectedSalary).toFixed(2)}</p>
+
+			  <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-gray-300 mb-6">
               <thead>
                 <tr>
@@ -205,7 +268,7 @@ const App: React.FC = () => {
               <tbody>
                 {results.map((result, index) => (
                   <tr key={index} style={{ backgroundColor: getColorForRatio(parseFloat(result['% of Take-Home'])) }}>
-                    <td className="border border-gray-300 p-2">{result['Term (Years)']}</td>
+                    <td className="border border-gray-300 p-2 ">{result['Term (Years)']}</td>
                     <td className="border border-gray-300 p-2">{result['Monthly Payment']}</td>
                     <td className="border border-gray-300 p-2">{result['% of Take-Home']}</td>
                   </tr>
@@ -213,22 +276,44 @@ const App: React.FC = () => {
               </tbody>
             </table>
           </div>
+              <p className="text-sm">Note: Table color coding is based on loan payment % of monthly take-home</p>
+            </div>
 
-          <div className="text-center">
-            <h2 className="text-xl font-bold mb-4">Financial Summary</h2>
-            <p>Monthly take-home pay (after taxes + fica): ${estimateTakehomePay(expectedSalary).toFixed(2)}</p>
-            <p>Estimated cost of living: ${costOfLiving}</p>
-            <p>Lowest monthly payment: ${Math.min(...results.map(r => parseFloat(r["Monthly Payment"].replace("$", "").replace(",", "")))).toFixed(2)}</p>
-            <p style={{ color: getColorForAmount(remainingMoney) }}>
-              Remaining monthly income: ${remainingMoney.toFixed(2)}
-            </p>
-            {remainingMoney < 0 && <p style={{ color: 'red' }}>Warning: Your estimated expenses exceed your take-home pay!</p>}
-            {remainingMoney >= 0 && remainingMoney < 400 && <p style={{ color: 'orange' }}>Caution: Your remaining monthly income is very low! Less than $400/month.</p>}
-            {remainingMoney >= 400 && remainingMoney < 750 && <p style={{ color: 'yellow' }}>Caution: Your remaining monthly income is low! Less than $750/month</p>}
-            {remainingMoney >= 750 && <p style={{ color: 'green' }}>Your financial plan appears sustainable! Minimum $750/month remaining.</p>}
+            {/* Financial Summary */}
+            <div>
+              <h2 className="text-lg font-bold mb-4">Financial Summary</h2>
+              <div className="space-y-2">
+                <p>Monthly take-home pay (after taxes + fica): ${estimateTakehomePay(expectedSalary).toFixed(2)}</p>
+                <p>Estimated cost of living: ${costOfLiving}</p>
+                <p>Lowest monthly payment: ${Math.min(...results.map(r => parseFloat(r["Monthly Payment"].replace("$", "").replace(",", "")))).toFixed(2)}</p>
+                <p style={{ color: getColorForAmount(remainingMoney) }}>
+                  Remaining monthly income: ${remainingMoney.toFixed(2)}
+                </p>
+                {remainingMoney < 0 && 
+                  <div className="bg-red-900/50 p-4 rounded">
+                    Warning: Your estimated expenses exceed your take-home pay!
+                  </div>
+                }
+                {remainingMoney >= 0 && remainingMoney < 400 && 
+                  <div className="bg-orange-900/50 p-4 rounded">
+                    Caution: Very low remaining income!
+                  </div>
+                }
+                {remainingMoney >= 400 && remainingMoney < 750 && 
+                  <div className="bg-yellow-900/50 p-4 rounded">
+                    Caution: Low remaining income!
+                  </div>
+                }
+                {remainingMoney >= 750 && 
+                  <div className="bg-green-900/50 p-4 rounded">
+                    Financial plan appears sustainable!
+                  </div>
+                }
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
