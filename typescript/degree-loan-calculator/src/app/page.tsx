@@ -7,11 +7,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './globals.css';
 
 interface LoanDetails {
-  totalTuition: number;
-  interestRate: number;
-  loanTerms: number[];
-  monthlyTakehome: number;
+  "Term (Years)": number;
+  "Monthly Payment": string;  // You can use `string` if you want to include the "$" symbol directly
+  "% of Take-Home": string;   // Same here with string for the percentage
 }
+
 
 const calculateMonthlyPayment = (principal: number, annualRate: number, years: number): number => {
   const r = annualRate / 12;
@@ -43,7 +43,7 @@ const getColorForAmount = (remainingCash: number): string => {
 };
 
 const calculateTotalTuition = (baseTuition: number, semestersPerYear: number, yearlyIncrease: number, numYrsCollege: number): number => {
-  let total = 0;
+  let total: number = 0;
   let yearlyTuition = baseTuition * semestersPerYear;
   for (let year = 0; year < numYrsCollege; year++) {
     total += yearlyTuition;
@@ -78,7 +78,7 @@ const App: React.FC = () => {
   const [interestRate, setInterestRate] = useState(9.0);
   const [expectedSalary, setExpectedSalary] = useState(50000);
   const [costOfLiving, setCostOfLiving] = useState(2500);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<LoanDetails[]>([]);
   const [remainingMoney, setRemainingMoney] = useState(0);
 
   const handleCalculate = () => {
