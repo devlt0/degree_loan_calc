@@ -3,15 +3,19 @@
 [TypeScript + Next.js/React.js + Tailwind CSS Tuition Loan Feasibility Calculator](https://degree-loan-calc.vercel.app/ "hosted by Vercel")
 <br><br>
 <br><br>
-Implementations to do;<br>
-- Rust + Yew<br>
-- Ruby on Rails<br>
-- Flask<br>
-- Django<br>
-- Vue.js<br>
-- Svelte.js<br>
+Implementations to do;
+- Rust + Yew
+- Ruby on Rails
 - pHp + Larvel
 - Go + Gin
 - Elixir + Pheonix
 - Dart + Flutter
 - Kotlin + Ktor
+
+<br> 
+
+- Flask
+- Django
+- Vue.js
+- Svelte.js
+
